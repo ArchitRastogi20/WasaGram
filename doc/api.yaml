@@ -1,0 +1,1006 @@
+openapi: 3.0.0
+info:
+  title: WASAPhoto API
+  description: API for WasaPhoto
+  version: 1.0.0
+tags:
+  - name: user
+    description: Operations related to users
+  - name: image
+
+    description: Operations related to photos, likes, and comments
+  - name: frontPage
+    description: Operations related to user profiles and streams
+  - name: login
+    description: Login operation
+
+components:
+  schemas:
+    # UserProperties:
+    #   description: "Properties of a user including userID, username, firstname, lastname, and email."
+    #   type: object
+    #   properties:
+    #     userID:
+    #       type: integer
+    #       format: int64
+    #     username:
+    #       type: string
+    #       pattern: "^.*?$"
+    #       minLength: 3
+    #       maxLength: 15
+    #     firstname:
+    #       type: string
+    #       pattern: "^[A-Za-z]+$"
+    #       minLength: 3
+    #       maxLength: 15
+    #     lastname:
+    #       type: string
+    #       pattern: "^[A-Za-z]+$"
+    #       minLength: 3
+    #       maxLength: 15
+    #     email:
+    #       type: string
+    #       format: email
+    #       minLength: 4
+    #       maxLength: 30
+    #   example:
+    #     userID: 123
+    #     username: John_doe
+    #     firstname: John
+    #     lastname: doe
+    #     email: 'johndoe@xyz.com'
+    #   required:
+    #     - userID
+    #     - username
+    #     - firstname
+    #     - lastname
+    #     - email
+    UserPropertiesCreateUser:
+      description: "Properties of a user including userID, username"
+      type: object
+      properties:
+        userID:
+          description: "UserID of the person"
+          type: integer
+          format: int64
+        username:
+          description: "username of the person"
+          type: string
+          pattern: "^.*?$"
+          minLength: 3
+          maxLength: 15
+
+      example:
+        userID: 123
+        username: Johndoe
+
+      required:
+        - userID
+        - username
+ 
+    UserUpdate:
+      description: 'Values for updating an user, the user can choose to change there username,firstname,lastname and email'
+      type: object
+      properties:
+        username:
+          description: "username of the person"
+          type: string
+          pattern: "^.*?$"
+          minLength: 3
+          maxLength: 15
+        firstname:
+          description: "firstname of the person"
+          type: string
+          pattern:  "^.*?$"
+          minLength: 3
+          maxLength: 15
+        lastname:
+          description: "lastname of the person"
+          type: string
+          pattern: "^.*?$"
+          minLength: 3
+          maxLength: 15
+        email:
+          description: "email of the person"
+          type: string
+          format: email
+          minLength: 4
+          maxLength: 30
+      example:
+        username: Johndoe
+        firstname: John
+        lastname: doe
+        email: 'johndoe@xyz.com'
+        
+    FollowRequest:
+      description: 'It which user we want to follow'
+      type: object
+      properties:
+        userID:
+          description: "UserID of the person"
+          type: integer
+          format: int64
+      example:
+        userID: 123
+      required:
+        - userID
+        
+    BanRequest:
+      description: 'It which user we want to ban'
+      type: object
+      properties:
+        userID:
+          description: "UserID of the person who we want to ban"
+          type: integer
+          format: int64
+      example:
+        userID: 123
+      required:
+        - userID
+  
+    Comment:
+      description: 'It contains the text data for the comment on an image'
+      type: object
+      properties:
+        text:
+          description: "Text we want to be the comment"
+          type: string
+          pattern: "^.*?$"
+          minLength: 2 
+          maxLength: 20
+      example:
+        text: 'Nice picture'
+      required: 
+        - text
+
+    UploadImage:
+      description: 'It coantins the photodata to upload an image'
+      type: object
+      properties:
+        photo_data:
+          description: "Binary photo data"
+          type: string
+          pattern: "^.*?$"
+          minLength: 0
+          maxLength: 100
+          format: binary
+      example:
+        photo_data: "010110010"
+      required:
+        - photo_data
+
+    UserPhoto:
+      description: 'It contains all the detials of a photo attached to a userID'
+      type: object
+      properties:
+        imageID:
+          description: "ImageID of the image"
+          type: integer
+          format: int64
+        photo_data:
+          description: "Binary photo data"
+          type: string
+          format: binary
+          minLength: 0
+          maxLength: 100
+        timestamp:
+          description: "timestamp of the image"
+          type: string
+          format: date-time
+          minLength: 20
+          maxLength: 20
+        text:
+          description: "Text we want to be the comment"
+          type: string
+          pattern: "^.*?$"
+          minLength: 2 
+          maxLength: 20
+        numberoflikes:
+          description: "number of likes on an image"
+          type: integer
+          format: int64
+      example:
+        imageID: 258
+        timestamp: "2023-12-21T17:32:28Z"
+        photo_data: "010110010"
+        text: 'nice pic'
+      required:
+        - imageID
+        - timestamp
+        - photo_data
+    
+        
+    UserPhotoProfile:
+      description: 'It contains details for the photos on a profile of a user'
+      type: object
+      properties:
+        imageID:
+          description: "ImageID of the image"
+          type: integer
+          format: int64
+        photo_data:
+          description: "Binary photo data"
+          type: string
+          format: binary
+          minLength: 0
+          maxLength: 100
+        timestamp:
+          description: "Timestamp of when the pic is uploaded"
+          type: string
+          format: date-time
+          minLength: 20
+          maxLength: 20
+      example:
+        imageID: 258
+        timestamp: "2023-12-21T17:32:28Z"
+        photo_data: "010110010"
+        #text: 'nice pic'
+      required:
+        - imageID
+        - photo_data
+        - timestamp
+  
+
+    UserStream:
+      description: 'It contains the data for the User stream page'
+      type: array
+      minItems: 0
+      maxItems: 200
+      items:
+        $ref: '#/components/schemas/UserPhoto'
+
+    UserProfile:
+      description: 'It contains data for the user profile'
+      type: object
+      properties:
+        userID:
+          description: "UserID of the person"
+          type: integer
+          format: int64
+        username:
+          description: "Username of the person"
+          type: string
+          pattern: '^.*?$'
+          minLength: 3
+          maxLength: 15
+        firstname:
+          description: "Firstname of the person"
+          type: string
+          pattern: "^.*?$"
+          minLength: 3
+          maxLength: 15
+        lastname:
+          description: "Lastname of the person"
+          type: string
+          pattern: "^.*?$"
+          minLength: 3
+          maxLength: 15
+        email:
+          description: "email of the person"
+          type: string
+          format: email
+          minLength: 4
+          maxLength: 30
+        photos:
+          description: "photos on the profile"
+          type: array
+          minItems: 0
+          maxItems: 200
+          items:
+            $ref: '#/components/schemas/UserPhotoProfile'
+      example:
+        userID: 123
+        username: Johndoe
+        firstname: John
+        lastname: doe
+        email: "johndoe@xyz.com"
+        photos:
+          imageID: 258
+          photo_data: "010110010"
+          timestamp: "2023-12-21T17:32:28Z"
+        
+      required:
+        - userID
+        - username
+        - firstname
+        - lastname
+        - email
+        - photos
+
+  responses:
+    # SuccessResponseUser:
+    #   description: "Successful response"
+    #   content:
+    #     application/json:
+    #       schema:
+    #         $ref: '#/components/schemas/UserPropertiesCreateUser'
+    # SuccessfulUpdationResponseUser:
+    #   description: Successful update of a user
+    #   content:
+    #     application/json:
+    #       schema:
+    #         $ref: '#/components/schemas/UserUpdate'
+    # DeletionResponseUser:
+    #   description: "User deleted successfully"
+    NotFoundResponseUser:
+      description: "User not found"
+    NoContentResponse:
+      description: "No content found"
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+paths:
+  /session:
+    post:
+      security:
+        - bearerAuth: [] #everywhere
+      tags:
+        - login
+      summary: Logs in the user
+      description: "If the user does not exist, it will be created,
+                    and an identifier is returned.
+                    If the user exists, the user identifier is returned."
+      operationId: doLogin
+      requestBody:
+        description: User details
+        required: true 
+        # here I have modfied do login create user function to match with how the user will look in my project
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPropertiesCreateUser'
+            example:
+              userID: 123
+              username: Johndoe
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPropertiesCreateUser'
+              example:
+                userID: 123
+                username: Johndoe
+
+  # we already create user in login  
+  # /users:
+  #   post:
+  #     security:
+  #       - bearerAuth: []
+  #     tags:
+  #     - user
+  #     summary: Create a new user
+      
+  #     operationId: createUser
+  #     description: 'creates the user'
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/UserPropertiesCreateUser'
+  #           example:
+  #             userID: 123
+  #             username: Johndoe
+  #     responses:
+  #       '201':
+  #         description: User created successfully
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/UserPropertiesCreateUser'
+  #             example:
+  #               userID: 123
+  #               username: Johndoe
+  /users/{userID}:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - user
+      summary: Update an existing user
+      operationId: setMyUserName
+      description: 'Update user user can update any one field excpet userID'
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: User ID to be updated
+          schema:
+            description: 'It sends the userID in path to update user'
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+            example:
+                username: Johndoe
+                fistname: John
+                lastname: doe
+                email: 'johndoe@xyz.com'
+      responses:
+        # '200':
+        #   description: User updated successfully
+        #   content:
+        #     application/json:
+        #       schema:
+        #         $ref: '#/components/schemas/UserUpdate'
+        #       example:
+        #         username: John_doe
+        #         fistname: John
+        #         lastname: doe
+        #         email: 'johndoe@xyz.com'
+        '201':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserUpdate'
+              example:
+                username: John_doe
+                fistname: John
+                lastname: doe
+                email: 'johndoe@xyz.com'
+        '404':
+          $ref: '#/components/responses/NotFoundResponseUser'
+        '204':
+          $ref: '#/components/responses/NoContentResponse'
+
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - user
+      summary: Delete a user
+      operationId: deleteUser
+      description: 'Delete a user'
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: User ID to be deleted
+          schema:
+            description: 'It sends userID from path to delete user'
+            type: integer
+            format: int64
+      responses:
+        '204': #chnage this one to 201 and 204 for no contnet 
+          description: User deleted successfully
+          # content:
+          #   application/json:
+          #     example:
+          #       message: User deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFoundResponseUser'
+        '401':
+          description: Unauthorized
+        '400':
+          description: Bad Request
+
+  /users/{userID}/follow: 
+    post:
+      security:
+        - bearerAuth: []
+      summary: Follow a user
+      tags:
+      - user
+      operationId: followUser
+      description: 'Follow a user'
+      parameters:
+      - name: userID
+        in: path
+        required: true
+        description: user id of the person in the session 
+        schema:
+          description: 'It sends which userID is requestion to follow a user'
+          type: integer
+          format: int64
+      - name: followListOwnerID
+        in: query
+        required: true
+        description: "Person I want to follow"
+        schema:
+          description: 'It sends userID that I want to follow'
+          type: integer
+          format: int64
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FollowRequest'
+            example:
+                userID: 123
+
+      responses:
+        # '201':
+        #   description: User followed successfully
+        '404':
+          $ref: '#/components/responses/NotFoundResponseUser'
+        '204':
+          $ref: '#/components/responses/NoContentResponse'
+
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Unfollow a user
+      tags:
+      - user
+      operationId: unfollowUser
+      description: 'un follow a user'
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: "Follower's user ID"
+          schema:
+            description: 'It sends userID that is follwoing'
+            type: integer
+            format: int64
+        - name: followListOwnerID
+          in: query
+          required: true
+          description: "User ID of the person to unfollow"
+          schema:
+            description: 'It sends userID that is being followed'
+            type: integer
+            format: int64
+      responses:
+        #no response for 200 
+        '404':
+          $ref: '#/components/responses/NotFoundResponseUser'
+        '204':
+          $ref: '#/components/responses/NoContentResponse'
+
+  /users/{userID}/ban:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Ban a user
+      tags:
+      - user
+      operationId:  banUser
+      description: 'Ban a user'
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: "User ID of the person in the seeion right now"
+          schema:
+            description: 'User who is in the session'
+            type: integer
+            format: int64
+        - name: BannedUserID
+          in: query
+          required: true
+          description: "User ID to be banned"
+          schema:
+            description: 'User ID to ban'
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BanRequest'
+            example:
+                userID: 123
+
+      responses:
+        # '200':
+        #   description: User banned successfully
+        # '201':
+        #   description: User banned successfully
+        '404':
+          $ref: '#/components/responses/NotFoundResponseUser'
+        '204':
+          $ref: '#/components/responses/NoContentResponse'
+
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Unban a user
+      tags:
+      - user
+      operationId: unbanUser
+      description: 'un ban a banned user'
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: "User ID to be unbanned"
+          schema:
+            description: 'User ID who has been banned'
+            type: integer
+            format: int64
+            
+        - name: BannedUserID #is the UserID of the person I want to ban
+          in: query
+          required: true
+          description: "User ID of the person to ban"
+          schema:
+            description: 'User ID of the person in the session'
+            type: integer
+            format: int64
+
+          
+      responses:
+        # '200':
+        #   description: User unbanned successfully
+        
+        '404':
+          $ref: '#/components/responses/NotFoundResponseUser'
+        '204':
+          $ref: '#/components/responses/NoContentResponse'
+
+  /users/{userID}/image:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Upload an image
+      tags:
+      - image
+      operationId: uploadPhoto
+      description: ' Upload a pic png or jpeg'
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: User ID uploading the image
+          schema:
+            description: "User ID of person in the session and trying to upload a picture"
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadImage'
+            example:
+              photo_data: "010110010"
+      responses:
+        # '201':
+        #   description: Image uploaded successfully
+        '204':
+          $ref: '#/components/responses/NoContentResponse'
+        # '201':
+        #   description: Image uploaded successfully
+        '404':
+          $ref: '#/components/responses/NotFoundResponseUser'
+
+  /users/{userID}/image/{imageID}:
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Delete an image
+      tags:
+      - image
+      operationId: deletePhoto
+      description: 'Delete a picture'
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: User ID deleting the image
+          schema:
+            description: "User ID of the person in the session deleting his own photo"
+            type: integer
+            format: int64
+        - name: imageID
+          in: path
+          required: true
+          description: Image ID to be deleted
+          schema:
+            description: "Image ID of the picture to be deleted"
+            type: integer
+            format: int64
+      responses:
+        '404':
+          $ref: '#/components/responses/NotFoundResponseUser'
+        '204':
+          $ref: '#/components/responses/NoContentResponse'
+
+  /users/{userID}/image/{imageID}/comment:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Add a comment to an image
+      tags:
+      - image
+      operationId: commentPhoto
+      description: 'Add comment to a user photo '
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: "User ID adding a comment"
+          schema:
+            description: "User ID who is adding comment"
+            type: integer
+            format: int64
+        - name: imageID
+          in: path
+          required: true
+          description: "Image ID to comment on"
+          schema:
+            description: "Image ID aka the image where the comment is being added"
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+            example:
+              text: 'Nice picture'
+      responses:
+        # '201':
+        #   description: Comment added successfully
+        '204':
+          $ref: '#/components/responses/NoContentResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponseUser'
+
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Remove a comment from an image
+      tags:
+      - image
+      operationId: uncommentPhoto
+      description: 'Remove a comment from a pic'
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: User ID removing a comment
+          schema:
+            description: "User ID of the person removing a comment"
+            type: integer
+        - name: imageID
+          in: path
+          required: true
+          description: Image ID to remove the comment from
+          schema:
+            description: "Image ID to which the comment is at"
+            type: integer
+            format: int64
+      responses:
+      
+        '404':
+          $ref: '#/components/responses/NotFoundResponseUser'
+        '204':
+          $ref: '#/components/responses/NoContentResponse'
+
+  /like/users/{userID}/image/{imageID}:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Add a like to an image
+      tags:
+      - image
+      operationId: likePhoto
+      description: ' Add a like to a pic'
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: User ID adding a like
+          schema:
+            description: "User ID who is adding a like"
+            type: integer
+            format: int64
+        - name: imageID
+          in: path
+          required: true
+          description: Image ID to like
+          schema:
+            description: "Image ID to which the like is being added"
+            type: integer
+            format: int64
+      responses:
+        # '201':
+        #   description: Like added successfully
+        '404':
+          $ref: '#/components/responses/NotFoundResponseUser'
+        '204':
+          $ref: '#/components/responses/NoContentResponse'
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Remove a like from an image
+      tags:
+      - image
+      operationId: unlikePhoto
+      description: 'remove a like from a pic'
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: User ID removing a like
+          schema:
+            description: "UserID of the person remoing its like"
+            type: integer
+            format: int64
+        - name: imageID
+          in: path
+          required: true
+          description: Image ID to remove the like from
+          schema:
+            description: "Image ID aka the image to which the like is linked to"
+            type: integer
+            format: int64
+      responses:
+        # '200':
+        #   description: Like removed successfully
+        '404':
+          $ref: '#/components/responses/NotFoundResponseUser'
+        '204':
+          $ref: '#/components/responses/NoContentResponse'
+  
+  /users/{userID}/image/{imageID}/comment/stream:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Get all comments on an image
+      tags:
+      - frontPage
+      operationId: getAllComments
+      description: 'Get all comments on a image'
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: "User ID whose profile is being requested"
+          schema:
+            description: "User ID of the person who we are trying to follow"
+            type: integer
+            format: int64
+        - name: imageID
+          in: path
+          required: true
+          description: "Image ID whose profile is being requested"
+          schema:
+            description: "Image ID aka the picture to which all the comments are linked to"
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Comment on image retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '404':
+          $ref: '#/components/responses/NotFoundResponseUser'
+  
+  /users/{userID}/image/{imageID}/like/stream:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Get number of likes on an image
+      tags:
+      - frontPage
+      operationId: getAllLikes
+      description: ' Count all likes on an image'
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: User ID whose profile is being requested
+          schema:
+            description: "User ID of the person who is in the session"
+            type: integer
+            format: int64
+        - name: imageID
+          in: path
+          required: true
+          description: Image ID is the picture is being requested
+          schema:
+            description: "Image ID aka the image to which all the likes are linked to"
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Number of likes on image retrieved successfully
+          content:
+            application/json:
+              schema:
+                description: 'It sends back number of likes on an image'
+                type: integer
+                example: 5
+        '404':
+          $ref: '#/components/responses/NotFoundResponseUser'
+  
+  /users/{userID}/profile:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Get user profile
+      tags:
+      - frontPage
+      operationId: getUserProfile
+      description: ' Get the user profile '
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: "User ID whose profile is being requested"
+          schema:
+            description: "User ID of the person for which we want to see the profile"
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: "User profile retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+              example:
+                userID: 123
+                username: jondoe
+                firstname: Jon
+                lastname: doe
+                email: "johndoe@xyz.com"
+                photos:
+                  - imageID: 1
+                    photo_data: "010110010"
+                    timestamp: "2023-01-01T12:00:00Z"
+                  - imageID: 2
+                    photo_data: "010110011"
+                    timestamp: "2023-01-02T12:30:00Z"
+        '404':
+          $ref: '#/components/responses/NotFoundResponseUser'
+
+
+
+  /users/{userID}/stream:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Get user stream
+      tags:
+      - frontPage
+      operationId: getMyStream
+      description: 'Get user strem in rev cronological manner'
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: "User ID whose stream is being requested"
+          schema:
+            description: "User ID of the person who we want to see the stream for "
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: User stream retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStream'
+              examples:
+                userStream:
+                  value:
+                    - imageID: 1
+                      photo_data: "010110010"
+                      timestamp: "2023-01-01T12:00:00Z"
+                      text: 'good pic'
+                      numberoflikes: 4
+                    - imageID: 2
+                      photo_data: "010110011"
+                      timestamp: "2023-01-02T12:30:00Z"
+        '404':
+          $ref: '#/components/responses/NotFoundResponseUser'
+
